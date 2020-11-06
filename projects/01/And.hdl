@@ -15,4 +15,6 @@ CHIP And {
 
     PARTS:
     // Put your code here:
+    NAND (in=a, in=b, out=nandab);
+    NAND (in=nandab, in=nandab, out=out);
 }
