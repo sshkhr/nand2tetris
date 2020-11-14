@@ -42,5 +42,44 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-   // Put you code here:
+    // Put you code here:
+    
+    // Get bus of zeros and ones
+    Not16(in=x, out=notx);
+    And16(a=x, b=notx, out=zeros);
+    
+    // MUX b/w x/y and zero bus based on zx/zy
+    Mux16(a=x, b=zeros, sel=zx, out=xorzero);
+    Mux16(a=y, b=zeros, sel=zy, out=yorzero);
+    
+    // Get bitwise NOT of MUXed o/p
+    Not16(in=xorzero, out=notxorzero);
+    Not16(in=yorzero, out=notyorzero);
+    
+    // MUX b/w x/y and notx/noty based on nx/ny
+    Mux16(a=xorzero, b=notxorzero, sel=nx, out=newx);
+    Mux16(a=yorzero, b=notyorzero, sel=ny, out=newy);
+    
+    // Get bitwise AND, OR of new x,y
+    And16(a=newx, b=newy, out=xandy);
+    Or16(a=newx, b=newy, out=xory);
+    
+    // MUX b/w xANDy and xORy based on f
+    Mux16(a=xandy, b=xory, sel=f, out=outinit);
+    
+    // Get bitwise NOT of MUXed o/p
+    Not16(in=outinit, out=notoutinit);
+
+    // MUX b/w out and NOTout based on no
+    Mux16(a=outinit, b=notoutinit, sel=no, out=tempout);
+
+    // Get value of zr
+    Or16Way(in=tempout, out=zerocheck);
+    Not(in=zerocheck, out=zr);
+
+    // Get value of ng using sign bit of out
+    Neg(in=tempout, out=nb);
+
+    // Return output
+    Or16(a=tempout, b=zeros, out=out);
 }

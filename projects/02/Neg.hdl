@@ -1,0 +1,19 @@
+/**
+ * Negative: 
+ * out = 1 if in[15]==1
+ *     = 0 otherwise
+ */
+
+CHIP Neg {
+    IN in[16];
+    OUT out;
+
+    PARTS:
+    // Put your code here:
+
+    Not(in=in[15], out=notmsb);
+    And(a=in[15], b=notmsb, out=zero);
+    Or(a=in[15], b=zero, out=out);    
+}
+
+
