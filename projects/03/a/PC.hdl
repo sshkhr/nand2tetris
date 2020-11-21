@@ -17,25 +17,20 @@ CHIP PC {
 
     PARTS:
     // Put your code here:
-
-    // Zero and One
-    Not16(in=in, out=notin);
-    And16(a=in, b=notin, out=zeros);
     
-    Not(in=inc, out=notinc);
-    And(a=inc, b=notinc, out=zero);
-    Or(a=inc, b=notinc, out=one);
-    
-    // Load
-    Register(in=in, load=load, out=regout);
+    // prevout and out are same but can't connect together due to HDL restrictions
 
     // Increment
-    ALU(x=regout ,y=zeros ,zx=zero ,nx=one ,zy=one ,ny=one ,f=one ,no=one ,out=incout ,zr=na ,ng=no);
-    
-    Mux16(a=regout, b=incout, sel=inc, out=add);
-    Mux16(a=add, b=regout, sel=load, out=resetin);
-    
+    Inc16(in=prevout,out=incout);
+    Mux16(a=prevout,b=incout,sel=inc,out=out1);
+
+    // Load
+    Mux16(a=out1,b=in,sel=load,out=out2);
+
     // Reset
-    Mux16(a=resetin, b=zeros, sel=reset, out=out);
+    Mux16(a=out2,b[0..15]=false,sel=reset,out=out3);
     
+    // Out
+    Register(in=out3,load=true,out=prevout);
+    Or16(a=prevout, b=prevout, out=out);
 }
