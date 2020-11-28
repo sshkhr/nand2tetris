@@ -75,7 +75,7 @@ M=D // n = size of screen
 	@CHECK
 	D;JEQ
 
-	// Screen[i] = 0
+	// Screen[i] = -1
 	@addr
 	D=M
 	@i
