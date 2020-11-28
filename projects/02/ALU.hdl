@@ -62,10 +62,10 @@ CHIP ALU {
     
     // Get bitwise AND, OR of new x,y
     And16(a=newx, b=newy, out=xandy);
-    Or16(a=newx, b=newy, out=xory);
+    Add16(a=newx, b=newy, out=sumxy);
     
     // MUX b/w xANDy and xORy based on f
-    Mux16(a=xandy, b=xory, sel=f, out=outinit);
+    Mux16(a=xandy, b=sumxy, sel=f, out=outinit);
     
     // Get bitwise NOT of MUXed o/p
     Not16(in=outinit, out=notoutinit);
@@ -78,7 +78,7 @@ CHIP ALU {
     Not(in=zerocheck, out=zr);
 
     // Get value of ng using sign bit of out
-    Neg(in=tempout, out=nb);
+    Neg(in=tempout, out=ng);
 
     // Return output
     Or16(a=tempout, b=zeros, out=out);

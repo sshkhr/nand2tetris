@@ -17,4 +17,20 @@ CHIP PC {
 
     PARTS:
     // Put your code here:
+    
+    // prevout and out are same but can't connect together due to HDL restrictions
+
+    // Increment
+    Inc16(in=prevout,out=incout);
+    Mux16(a=prevout,b=incout,sel=inc,out=out1);
+
+    // Load
+    Mux16(a=out1,b=in,sel=load,out=out2);
+
+    // Reset
+    Mux16(a=out2,b[0..15]=false,sel=reset,out=out3);
+    
+    // Out
+    Register(in=out3,load=true,out=prevout);
+    Or16(a=prevout, b=prevout, out=out);
 }
