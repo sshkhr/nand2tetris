@@ -14,83 +14,40 @@
 // Put your code here.
 
 
-@SCREEN
-D=A
-@addr
-M=D   // addr = base address of screen
-
-
-@8191
-D=A
-@n
-M=D // n = size of screen 
-
-(CHECK)
-
-	@i
-	M=0 // i = 0
-
-	@KBD
-	D=M    // D=0 means no key pressed, D=1 means key pressed
-
-	@BLACK
-	D; JNE  // Draw black screen if D=1
-
-	@WHITE
-	D; JEQ  // Draw black screen if D=0
-
-
-(BLACK)
-
-	// if (i==n) goto CHECK
-	@i
-	D=M
-	@n
-	D=D-M
-	@CHECK
-	D;JEQ
-
-	// Screen[i] = -1
+(START)
+	@SCREEN
+	D=A
 	@addr
-	D=M
-	@i
-	A=D+M
-	M=-1
+	M=D   // addr = base address of screen
 
-	// i++
-	@i
-	M=M+1
+(FILL)   // start filling loop by checking for key press
+    @KBD 
+    D=M
+    @BLACK  // if key pressed jump to setting black
+    D;JNE 
 
-	@BLACK
-	0;JMP // loop BLACK
+(WHITE) // Set white
+    D=0
+    @SET   // if key not pressed jump to setting white
+    0;JMP
 
+(BLACK) // Set black
+    D=-1
 
-(WHITE)
+(SET) 
+    @addr
+    A=M
+    M=D   // Set the screen pixels using indirect addressing
 
-	// if (i==n) goto CHECK
-	@i
-	D=M
-	@n
-	D=D-M
-	@CHECK
-	D;JEQ
+    @addr
+    M=M+1 // Increment the address to next screen bit
 
-	// Screen[i] = 0
-	@addr
-	D=M
-	@i
-	A=D+M
-	M=0
+    @KBD  // Screen ends where keyboard starts
+    D=A
+    @addr
+    D=D-M
+    @START
+    D;JLE // Restart if all of screen is filled
 
-	// i++
-	@i
-	M=M+1
-
-	@WHITE
-	0;JMP // loop WHITE
-
-
-// Terminate
-(END)
-	@END
-	0; JMP
+    @FILL
+    0;JMP // Continue the fill screen loop
