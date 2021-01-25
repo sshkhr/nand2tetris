@@ -40,4 +40,21 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+
+    Mux16(a=instruction, b=aluout, sel=K, out=Ain); // Mux instruction and ALU output
+    
+    Register(in=Ain, sel=K, out=Aout); // register A
+
+    Register(in=Aout, sel=K, out=Dout); // register D 
+
+    Mux16(a=Aout, b=inM, sel=K, out=Ain); // Mux instruction and ALU output
+
+    PC(in= ,load= ,inc= ,reset= ,out = pc); // Program counter
+
+    ALU(x=Dout, y=Aout, zx= , nx= , zy= , ny= , f= , no= , out=outM, zr=zr, ng=ng);
+
+    Or16(a= Aout, b= Aout, out=addressM); // address buffer out
+
+
+    
 }
