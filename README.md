@@ -17,6 +17,6 @@ These are the projects I implement as my project solutions for the [Nand2Tetris]
 
 | Week | Software | Details |
 | :---         |     :---:      |          ---: |
-| [4](projects/04/)   | [Fill](projects/04/a/Fill.asm), [Mult](projects/04/a/mult.asm)     | Wrote assembly programs which (1) Fills screen based on keyboard input and (2) Multiplies two numbers and stores the results in RAM    |
+| [4](projects/04/)   | [Fill](projects/04/fill/Fill.asm), [Mult](projects/04/mult/mult.asm)     | Wrote assembly programs which (1) Fills screen based on keyboard input and (2) Multiplies two numbers and stores the results in RAM    |
 | [6](projects/06/)   |      |  |
 
