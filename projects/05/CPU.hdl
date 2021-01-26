@@ -41,18 +41,65 @@ CHIP CPU {
     PARTS:
     // Put your code here:
 
-    Mux16(a=instruction, b=aluout, sel=K, out=Ain); // Mux instruction and ALU output
+    // If C-instruction (opcode 1)
+    //
+    // a = instruction[12]
+    // comp = instruction[6..11]
+    // dest = instruction[3..5]
+    // jmp = instruction[0..2]
     
-    Register(in=Ain, sel=K, out=Aout); // register A
+    // MUX next instruction from instruction/ALU output
+    //
+    // If A-instruction (opcode 0):
+    //	use instruction
+    // Else: 
+    // 	use ALUout
+    Mux16(a=instruction, b=ALUout, sel=instruction[15], out=Ain); 
+    
+    // A register loaded with muxed instruction/ALUoutput :
+    // 
+    // If A-instruction (opcode 0):
+    //	Yes
+    // Else if C-instruction (opcode 1): 
+    // 	when last destination bit (instruction[5]) is set
+    Not(in=instruction[15], out=opcodeA)
+    And(a=instruction[15], b=instruction[5], out= cloadA);
+    Or(a=opcodeA, b=cloadA, out= loadA);
+    Register(in=Ain, load=loadA, out=Aout);
 
-    Register(in=Aout, sel=K, out=Dout); // register D 
+    // D register
+    // Stores ALU output for C-instruction when 2nd destination bit is set
+    And(a=instruction[15], b=instruction[4], out= loadD);
+    Register(in=ALUout, load=loadD, out=Dout); 
 
-    Mux16(a=Aout, b=inM, sel=K, out=Ain); // Mux instruction and ALU output
+    // MUX A-register and M-register (input) if a bit set for C-instruction
+    Mux16(a=Aout, b=inM, sel=instruction[12], out=Muxout); 
+    
+    // ALU
+    //
+    // comp bits (instruction[6..11]) from C-instruction serve as control bits for ALU 
+    ALU(x=Dout, y=Muxout, zx=instruction[6] , nx=instruction[7] , zy=instruction[8] , ny=instruction[9] , f=instruction[10] , no=instruction[11] , out=ALUout, zr=zr, ng=ng);
 
-    PC(in= ,load= ,inc= ,reset= ,out = pc); // Program counter
+    // Write ALU o/p to M when C-instruction and lowest destination bit set
+    Or(a=instruction[15], b=instruction[3], out=writeM);
 
-    ALU(x=Dout, y=Aout, zx= , nx= , zy= , ny= , f= , no= , out=outM, zr=zr, ng=ng);
-
+    // Program counter
+    //
+    // If no jump (instruction[0..2] = 0) then increment
+    Nor(a=instruction[0],b=instruction[1],out=intnojmp)
+    Nor(a=intnojmp,b=instruction[2],out=nojmp)
+    //
+    // If goto/unconditional jump (instruction[0..2] = 1) then load instruction
+    And(a=instruction[0],b=instruction[1],out=intgoto)
+    And(a=intgoto,b=instruction[2],out=goto)
+    //
+    // If conditional goto check zr and ng
+    // If true PC=A else PC++
+    // get loadPC and incPC from here
+    //
+    PC(in=Aout, load=loadPC ,inc=incPC ,reset=reset ,out=pc); 
+    
+    
     Or16(a= Aout, b= Aout, out=addressM); // address buffer out
 
 
